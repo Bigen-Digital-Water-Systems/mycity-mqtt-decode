@@ -1,4 +1,4 @@
-# MQTT Decode Microservice
+# MyCity MQTT Decode Microservice
 
 A Node.js microservice that decrypts AES-encrypted MQTT payloads and republishes them to an MQTT broker. This service is designed to work with MyCity devices, decoding encrypted telemetry data and forwarding it to a broker for further processing.
 
