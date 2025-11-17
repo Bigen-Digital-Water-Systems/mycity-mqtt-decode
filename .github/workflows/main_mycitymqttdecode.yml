@@ -1,0 +1,53 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and deploy container app to Azure Web App - mycitymqttdecode
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read #This is required for actions/checkout
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to container registry
+        uses: docker/login-action@v2
+        with:
+          registry: bigendockerimages.azurecr.io/
+          username: ${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_5C8E7F349C32471293F2B8564214F1AC }}
+          password: ${{ secrets.AZUREAPPSERVICE_CONTAINERPASSWORD_9BF834F7D4D0487C8F0074980886CBB7 }}
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: bigendockerimages.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_5C8E7F349C32471293F2B8564214F1AC }}/bigendockerimages/mycitymqttdecode:${{ github.sha }}
+          file: ./Dockerfile
+
+  deploy:
+    runs-on: ubuntu-latest
+    
+    needs: build
+    
+    steps:
+      
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'mycitymqttdecode'
+          slot-name: 'Production'
+          images: 'bigendockerimages.azurecr.io/${{ secrets.AZUREAPPSERVICE_CONTAINERUSERNAME_5C8E7F349C32471293F2B8564214F1AC }}/bigendockerimages/mycitymqttdecode:${{ github.sha }}'
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_36AB7147525843BD9D981675FA5D56D7 }}
