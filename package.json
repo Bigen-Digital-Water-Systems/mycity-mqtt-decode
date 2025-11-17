@@ -1,0 +1,25 @@
+{
+	"name": "mqtt-decode",
+	"version": "1.0.0",
+	"description": "Template for dashboard projects",
+	"main": "app.js",
+	"dependencies": {
+		"axios": "^1.13.2",
+		"body-parser": "^2.2.0",
+		"crypto-js": "^4.2.0",
+		"dotenv": "^17.2.3",
+		"express": "^5.1.0",
+		"mqtt": "^5.14.1"
+	},
+	"prettier": {
+		"bracketSameLine": true,
+		"printWidth": 800,
+		"tabWidth": 4,
+		"useTabs": true
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.39.0",
+		"eslint": "^9.39.0",
+		"globals": "^16.5.0"
+	}
+}
