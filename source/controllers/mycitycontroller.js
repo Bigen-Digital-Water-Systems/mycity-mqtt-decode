@@ -39,7 +39,11 @@ const mycityController = (function () {
 			data.ts = data.ts * 1000;
 			data.values.decoded = true;
 
-			// Publish via MQTT
+			// Output decrypted data to console for debugging
+			console.log("Decrypted Data:", data);
+			console.log("LoggerId:", req.body.loggerId);
+			console.log("Credentials:", req.body.credentials);
+			console.log("------------------------------");
 
 			// Connect to MQTT Broker
 			const client = mqtt.connect(process.env.MYCITY_MQTT_BROKER_URL, {
