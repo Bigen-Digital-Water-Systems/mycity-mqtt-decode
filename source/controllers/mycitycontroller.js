@@ -9,12 +9,14 @@ const AES_KEY = CryptoJS.enc.Hex.parse(process.env.MYCITY_AES_KEY);
 const AES_IV = CryptoJS.enc.Hex.parse(process.env.MYCITY_AES_IV);
 
 // Payload log file
-// On Azure App Service, %HOME%/LogFiles is persistent storage (visible via Kudu / FTP).
+// On Azure App Service the persistent share is mounted at /home (visible in Kudu / File Manager).
+// Inside our container HOME is /home/node, so use /home/LogFiles explicitly.
+// Requires the app setting WEBSITES_ENABLE_APP_SERVICE_STORAGE=true for custom containers.
 // Locally it falls back to ./data (gitignored). Override with PAYLOAD_LOG_FILE.
 const PAYLOAD_LOG_FILE =
 	process.env.PAYLOAD_LOG_FILE ||
-	(process.env.WEBSITE_SITE_NAME && process.env.HOME
-		? path.join(process.env.HOME, "LogFiles", "mycity-payloads.txt")
+	(process.env.WEBSITE_SITE_NAME
+		? path.join("/home", "LogFiles", "mycity-payloads.txt")
 		: path.join(__dirname, "..", "..", "data", "mycity-payloads.txt"));
 
 // Create the file on startup so it exists before the first payload arrives
