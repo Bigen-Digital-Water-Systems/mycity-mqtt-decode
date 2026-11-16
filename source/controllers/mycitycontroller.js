@@ -28,8 +28,8 @@ try {
 	console.error("Error creating payload log file:", error);
 }
 
-const savePayload = (loggerId, payload) => {
-	const line = `${new Date().toISOString()}\t${loggerId}\t${payload}\n`;
+const savePayload = (body) => {
+	const line = `${new Date().toISOString()}\t${JSON.stringify(body)}\n`;
 	fs.appendFile(PAYLOAD_LOG_FILE, line, (err) => {
 		if (err) console.error("Error saving payload to file:", err);
 	});
@@ -41,7 +41,7 @@ const mycityController = (function () {
 		try {
 
 			console.log(req.body);
-			savePayload(req.body.loggerId, req.body.payload);
+			savePayload(req.body);
 
 			const hex = req.body.payload;
 
