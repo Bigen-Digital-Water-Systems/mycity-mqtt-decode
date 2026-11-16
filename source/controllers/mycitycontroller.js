@@ -1,15 +1,46 @@
 // Node Modules
 const mqtt = require("mqtt");
 const CryptoJS = require("crypto-js");
+const fs = require("fs");
+const path = require("path");
 
 // AES config
 const AES_KEY = CryptoJS.enc.Hex.parse(process.env.MYCITY_AES_KEY);
 const AES_IV = CryptoJS.enc.Hex.parse(process.env.MYCITY_AES_IV);
 
+// Payload log file
+// On Azure App Service, %HOME%/LogFiles is persistent storage (visible via Kudu / FTP).
+// Locally it falls back to ./data (gitignored). Override with PAYLOAD_LOG_FILE.
+const PAYLOAD_LOG_FILE =
+	process.env.PAYLOAD_LOG_FILE ||
+	(process.env.WEBSITE_SITE_NAME && process.env.HOME
+		? path.join(process.env.HOME, "LogFiles", "mycity-payloads.txt")
+		: path.join(__dirname, "..", "..", "data", "mycity-payloads.txt"));
+
+// Create the file on startup so it exists before the first payload arrives
+try {
+	fs.mkdirSync(path.dirname(PAYLOAD_LOG_FILE), { recursive: true });
+	fs.closeSync(fs.openSync(PAYLOAD_LOG_FILE, "a"));
+	console.log("Saving payloads to:", PAYLOAD_LOG_FILE);
+} catch (error) {
+	console.error("Error creating payload log file:", error);
+}
+
+const savePayload = (loggerId, payload) => {
+	const line = `${new Date().toISOString()}\t${loggerId}\t${payload}\n`;
+	fs.appendFile(PAYLOAD_LOG_FILE, line, (err) => {
+		if (err) console.error("Error saving payload to file:", err);
+	});
+};
+
 const mycityController = (function () {
 	// Example method to log received data, chanege and add as needed
 	const decodeData = (req, res) => {
 		try {
+
+			console.log(req.body.payload);
+			savePayload(req.body.loggerId, req.body.payload);
+
 			const hex = req.body.payload;
 
 			const decrypted = CryptoJS.AES.decrypt(
