@@ -40,7 +40,7 @@ const mycityController = (function () {
 	const decodeData = (req, res) => {
 		try {
 
-			console.log(req.body.payload);
+			console.log(req.body);
 			savePayload(req.body.loggerId, req.body.payload);
 
 			const hex = req.body.payload;
